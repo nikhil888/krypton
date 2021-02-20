@@ -22,15 +22,15 @@ const PortfolioCoin = (props: PortfolioCoinProps) => {
         <View style={styles.root}>
             <View style={styles.left}>
             <Image style={styles.image} source={{ uri:image }}/>
-            <View>
+              <View>
                 <Text style={styles.name}>{name}</Text>
                 <Text style={styles.symbol}>{symbol}</Text>
-                </View>
                 </View>
                 <View style={{alignItems:'flex-end'}}>
                 <Text style={styles.value}>${valueUSD}</Text>
                 <Text style={styles.amount}>{amount}</Text>
-                </View>  
+                </View> 
+                </View>
             </View>
            
     )
