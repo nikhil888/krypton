@@ -1,42 +1,47 @@
-import React from 'react'
-import { View, Text, Image } from "react-native";
-import styles from './styles';
+import React, {useEffect} from 'react';
+import {View, Text, Image, Pressable} from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import styles from './styles'
+import PercentageChange from "../PercentageChange";
 
 export interface MarketCoinProps {
-    MarketCoin: {
-        image: string,
-        name: string,
-        symbol: string,
-        valueChange24: number,
-        valueUSD: number,
-    }
+  marketCoin: {
+    image: string,
+    name: string,
+    symbol: string,
+    valueChange24H: number,
+    valueUSD: number,
+  }
 }
+
 
 const MarketCoin = (props: MarketCoinProps) => {
-    const {
-        MarketCoin: {
-            image, name, symbol, valueChange24, valueUSD
-        }
+  const navigation = useNavigation();
 
-    } = props;
-    return (
-        <View style={styles.root}>
-            <View style={styles.left}>
-                <Image style={styles.image} source={{ uri: image }} />
-                <View>
-                    <Text style={styles.name}>{name}</Text>
-                    <Text style={styles.symbol}>{symbol}</Text>
-                </View>
-                <View style={{ alignItems: 'flex-end' }}>
-                <Text style={styles.value}>${valueUSD}</Text>
-                <Text style={{ color: valueChange24 > 0 ? '#4bdb00': '#f10000' }}>
-                    {valueChange24 > 0 && '+'}{valueChange24}
-                    </Text>
-            </View>
-            </View>
+  const {
+    marketCoin: {
+      image,
+      name,
+      symbol,
+      valueChange24H,
+      valueUSD,
+    },
+  } = props;
+  return (
+    <Pressable style={styles.root} onPress={() => navigation.navigate('CoinDetails')}>
+      <View style={styles.left}>
+        <Image style={styles.image} source={{ uri: image}} />
+        <View>
+          <Text style={styles.name}>{name}</Text>
+          <Text style={styles.symbol}>{symbol}</Text>
         </View>
+      </View>
+      <View style={{alignItems: 'flex-end'}}>
+        <Text style={styles.value}>${valueUSD}</Text>
+        <PercentageChange value={valueChange24H} />
+      </View>
+    </Pressable>
+  );
+};
 
-    )
-}
-
-export default MarketCoin
+export default MarketCoin;
