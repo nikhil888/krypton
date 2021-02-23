@@ -1,0 +1,25 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-krypton-dev-01241-authRole",
+      "UnauthRoleArn": "arn:aws:iam::273535323461:role/amplify-krypton-dev-01241-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::273535323461:role/amplify-krypton-dev-01241-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-krypton-dev-01241-deployment",
+      "UnauthRoleName": "amplify-krypton-dev-01241-unauthRole",
+      "StackName": "amplify-krypton-dev-01241",
+      "StackId": "arn:aws:cloudformation:us-east-1:273535323461:stack/amplify-krypton-dev-01241/958323c0-7474-11eb-87ec-0ec209969e4d",
+      "AmplifyAppId": "d2idpk5g09arrz"
+    },
+    "categories": {
+      "auth": {
+        "krypton124e04d6": {
+          "googleClientId": "923511547568-alc83dco6cmg0ei8dcqnbuor2hi701id.apps.googleusercontent.com"
+        }
+      },
+      "function": {
+        "krypton124e04d6PostConfirmation": {}
+      }
+    }
+  }
+}
