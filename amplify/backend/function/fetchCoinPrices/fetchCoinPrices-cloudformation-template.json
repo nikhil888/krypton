@@ -1,39 +1,11 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "Lambda resource stack creation using Amplify CLI",
+  "Description": "Lambda Function resource stack creation using Amplify CLI",
   "Parameters": {
-    "GROUP": {
+    "CloudWatchRule": {
       "Type": "String",
-      "Default": ""
-    },
-    "modules": {
-      "Type": "String",
-      "Default": "",
-      "Description": "Comma-delimmited list of modules to be executed by a lambda trigger. Sent to resource as an env variable."
-    },
-    "resourceName": {
-      "Type": "String",
-      "Default": ""
-    },
-    "trigger": {
-      "Type": "String",
-      "Default": "true"
-    },
-    "functionName": {
-      "Type": "String",
-      "Default": ""
-    },
-    "roleName": {
-      "Type": "String",
-      "Default": ""
-    },
-    "parentResource": {
-      "Type": "String",
-      "Default": ""
-    },
-    "parentStack": {
-      "Type": "String",
-      "Default": ""
+      "Default": "NONE",
+      "Description": " Schedule Expression"
     },
     "env": {
       "Type": "String"
@@ -61,12 +33,12 @@
         "FunctionName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "krypton124e04d6PostConfirmation",
+            "fetchCoinPrices",
             {
               "Fn::Join": [
                 "",
                 [
-                  "krypton124e04d6PostConfirmation",
+                  "fetchCoinPrices",
                   "-",
                   {
                     "Ref": "env"
@@ -81,14 +53,8 @@
             "ENV": {
               "Ref": "env"
             },
-            "MODULES": {
-              "Ref": "modules"
-            },
             "REGION": {
               "Ref": "AWS::Region"
-            },
-            "GROUP": {
-              "Ref": "GROUP"
             }
           }
         },
@@ -98,11 +64,12 @@
             "Arn"
           ]
         },
-        "Runtime": "nodejs10.x",
+        "Runtime": "nodejs12.x",
+        "Layers": [],
         "Timeout": "25",
         "Code": {
           "S3Bucket": "amplify-krypton-dev-01241-deployment",
-          "S3Key": "amplify-builds/krypton124e04d6PostConfirmation-4c746655375852654949-build.zip"
+          "S3Key": "amplify-builds/fetchCoinPrices-49763737474a324a5169-build.zip"
         }
       }
     },
@@ -112,12 +79,12 @@
         "RoleName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "krypton124e04d6PostConfirmation",
+            "kryptonLambdaRoleb72ef7ca",
             {
               "Fn::Join": [
                 "",
                 [
-                  "krypton124e04d6PostConfirmation",
+                  "kryptonLambdaRoleb72ef7ca",
                   "-",
                   {
                     "Ref": "env"
@@ -187,6 +154,45 @@
           ]
         }
       }
+    },
+    "CloudWatchEvent": {
+      "Type": "AWS::Events::Rule",
+      "Properties": {
+        "Description": "Schedule rule for Lambda",
+        "ScheduleExpression": {
+          "Ref": "CloudWatchRule"
+        },
+        "State": "ENABLED",
+        "Targets": [
+          {
+            "Arn": {
+              "Fn::GetAtt": [
+                "LambdaFunction",
+                "Arn"
+              ]
+            },
+            "Id": {
+              "Ref": "LambdaFunction"
+            }
+          }
+        ]
+      }
+    },
+    "PermissionForEventsToInvokeLambda": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "LambdaFunction"
+        },
+        "Action": "lambda:InvokeFunction",
+        "Principal": "events.amazonaws.com",
+        "SourceArn": {
+          "Fn::GetAtt": [
+            "CloudWatchEvent",
+            "Arn"
+          ]
+        }
+      }
     }
   },
   "Outputs": {
@@ -203,14 +209,19 @@
         ]
       }
     },
+    "Region": {
+      "Value": {
+        "Ref": "AWS::Region"
+      }
+    },
     "LambdaExecutionRole": {
       "Value": {
         "Ref": "LambdaExecutionRole"
       }
     },
-    "Region": {
+    "CloudWatchEventRule": {
       "Value": {
-        "Ref": "AWS::Region"
+        "Ref": "CloudWatchEvent"
       }
     }
   }

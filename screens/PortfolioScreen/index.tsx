@@ -1,98 +1,61 @@
-import React from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {View, Text, Image, FlatList} from 'react-native';
+import {API, graphqlOperation} from 'aws-amplify';
+import {} from '../../src/graphql/queries';
 import styles from './styles';
 import PortfolioCoin from "../../components/PortfolioCoin";
+import {useNavigation} from '@react-navigation/native';
+import {getUserPortfolio} from './queries';
+import AppContext from "../../utils/AppContext";
+import formatMoney from "../../utils/formatMoney";
 const image =  require('../../assets/images/Saly-10.png');
 
-const portfolioCoins = [{
-  id: '1',
-  name: 'Virtual Dollars',
-  image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcREsrUrtzFSk6AtyI4gvyVFjum9BqVixMQ7hw&usqp=CAU',
-  symbol: 'USD',
-  amount: 69.420,
-  valueUSD: 69420,
-}, {
-  id: '2',
-  name: 'Bitcoin',
-  image: 'https://notjustdev-dummy.s3.us-east-2.amazonaws.com/avatars/1.jpg',
-  symbol: 'USD',
-  amount: 1.12,
-  valueUSD: 59420,
-}, {
-  id: '3',
-  name: 'Etherium',
-  image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcREsrUrtzFSk6AtyI4gvyVFjum9BqVixMQ7hw&usqp=CAU',
-  symbol: 'ETH',
-  amount: 30,
-  valueUSD: 30120,
-},{
-    id: '3',
-    name: 'Etherium',
-    image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcREsrUrtzFSk6AtyI4gvyVFjum9BqVixMQ7hw&usqp=CAU',
-    symbol: 'ETH',
-    amount: 30,
-    valueUSD: 30120,
-  },{
-    id: '3',
-    name: 'Etherium',
-    image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcREsrUrtzFSk6AtyI4gvyVFjum9BqVixMQ7hw&usqp=CAU',
-    symbol: 'ETH',
-    amount: 30,
-    valueUSD: 30120,
-  },{
-    id: '3',
-    name: 'Etherium',
-    image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcREsrUrtzFSk6AtyI4gvyVFjum9BqVixMQ7hw&usqp=CAU',
-    symbol: 'ETH',
-    amount: 30,
-    valueUSD: 30120,
-  },{
-    id: '3',
-    name: 'Etherium',
-    image: 'https://notjustdev-dummy.s3.us-east-2.amazonaws.com/avatars/1.jpg',
-    symbol: 'ETH',
-    amount: 30,
-    valueUSD: 30120,
-  },{
-    id: '3',
-    name: 'Etherium',
-    image: 'https://notjustdev-dummy.s3.us-east-2.amazonaws.com/avatars/1.jpg',
-    symbol: 'ETH',
-    amount: 30,
-    valueUSD: 30120,
-  },{
-    id: '3',
-    name: 'Etherium',
-    image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcREsrUrtzFSk6AtyI4gvyVFjum9BqVixMQ7hw&usqp=CAU',
-    symbol: 'ETH',
-    amount: 30,
-    valueUSD: 30120,
-  },{
-    id: '3',
-    name: 'Etherium',
-    image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcREsrUrtzFSk6AtyI4gvyVFjum9BqVixMQ7hw&usqp=CAU',
-    symbol: 'ETH',
-    amount: 30,
-    valueUSD: 30120,
-  },{
-    id: '3',
-    name: 'Etherium',
-    image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcREsrUrtzFSk6AtyI4gvyVFjum9BqVixMQ7hw&usqp=CAU',
-    symbol: 'ETH',
-    amount: 30,
-    valueUSD: 30120,
-  }]
-  
 
 const PortfolioScreen = () => {
+  const [balance, setBalance] = useState(0);
+  const [portfolioCoins, setPortfolioCoins] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const navigation = useNavigation();
+
+  const { userId } = useContext(AppContext);
+
+  const fetchPortfolio = async () => {
+    setLoading(true);
+    try {
+      const response = await API.graphql(
+        graphqlOperation(
+          getUserPortfolio,
+          { id: userId },
+        )
+      )
+      setBalance(response.data.getUser.networth)
+      setPortfolioCoins(response.data.getUser.portfolioCoins.items)
+    } catch (e) {
+      console.log(e)
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchPortfolio();
+  }, [])
+
+  React.useEffect(() => {
+    return navigation.addListener('focus', () => {
+      fetchPortfolio();
+    });
+  }, [navigation]);
+
   return (
     <View style={styles.root}>
-   
-
       <FlatList
         style={{width: '100%'}}
         data={portfolioCoins}
         renderItem={({item}) => <PortfolioCoin portfolioCoin={item} />}
+        onRefresh={fetchPortfolio}
+        refreshing={loading}
         showsVerticalScrollIndicator={false}
         ListHeaderComponentStyle={{alignItems: 'center'}}
         ListHeaderComponent={() => (
@@ -100,7 +63,7 @@ const PortfolioScreen = () => {
             <Image style={styles.image} source={image} />
             <View style={styles.balanceContainer}>
               <Text style={styles.label}>Portfolio balance</Text>
-              <Text style={styles.balance}>$69.420</Text>
+              <Text style={styles.balance}>${formatMoney(balance)}</Text>
             </View>
           </>
         )}

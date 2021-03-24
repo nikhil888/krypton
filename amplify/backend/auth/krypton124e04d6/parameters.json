@@ -55,17 +55,15 @@
         "Ref": "AWS::StackId"
     },
     "permissions": [],
-    "dependsOn": [
-        {
-            "category": "function",
-            "resourceName": "krypton124e04d6PostConfirmation",
-            "triggerProvider": "Cognito",
-            "attributes": [
-                "Arn",
-                "Name"
-            ]
-        }
-    ],
+    "dependsOn": [{
+        "category": "function",
+        "resourceName": "krypton124e04d6PostConfirmation",
+        "triggerProvider": "Cognito",
+        "attributes": [
+            "Arn",
+            "Name"
+        ]
+    }],
     "thirdPartyAuth": true,
     "authProviders": [
         "accounts.google.com"
